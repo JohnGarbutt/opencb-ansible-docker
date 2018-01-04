@@ -14,3 +14,19 @@
     - "{{ minimal_storage_mongo_data }}:/data/db:rw"
     exposed_ports:
     - 27017
+
+- name: Ensure solr data dir present
+  file:
+    path: "{{ minimal_storage_solr_data }}"
+    state: directory
+    mode: 0750
+
+- name: Add Solr container
+  docker_container:
+    name: dev_solr
+    image: solr:6.4.2
+    state: present
+    volumes:
+    - "{{ minimal_storage_solr_data }}:/opt/solr/mydata"
+    published_ports:
+    - 8983
