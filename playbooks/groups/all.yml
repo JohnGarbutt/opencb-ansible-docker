@@ -3,3 +3,4 @@
   become: no
   roles:
   - minimal-storage
+  - minimal-opencb-tomcat

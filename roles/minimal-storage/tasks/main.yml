@@ -12,8 +12,8 @@
     state: started
     volumes:
     - "{{ minimal_storage_mongo_data }}:/data/db:rw"
-    exposed_ports:
-    - 27017
+    published_ports:
+    - 27017:27017
 
 - name: Ensure solr data dir present
   file:

@@ -1,0 +1,8 @@
+---
+- name: Add tomcat container
+  docker_container:
+    name: opencb
+    image: tomcat:8.5-jre8
+    state: started
+    published_ports:
+    - 8080:8080
