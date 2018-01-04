@@ -1,0 +1,16 @@
+---
+- name: Ensure mongo data dir present
+  file:
+    path: "{{ minimal_storage_mongo_data }}"
+    state: directory
+    mode: 0750
+
+- name: Add Mongo container
+  docker_container:
+    name: dev_mongo
+    image: mongo:3.6.1-jessie
+    state: present
+    volumes:
+    - "{{ minimal_storage_mongo_data }}:/data/db:rw"
+    exposed_ports:
+    - 27017
