@@ -1,3 +1,5 @@
 ---
 minimal_storage_mongo_data: ~/var/lib/opencb/mongo
+
 minimal_storage_solr_data: ~/var/lib/opencb/solr
+minimal_storage_solr_conf: ~/var/lib/opencb/solr_conf

@@ -21,6 +21,35 @@
     state: directory
     mode: 0750
 
+- name: Ensure solr conf dir present
+  file:
+    path: "{{ minimal_storage_solr_conf }}"
+    state: directory
+    mode: 0755
+
+- name: Ensure solr conf extract dir present
+  file:
+    path: ~/tmp
+    state: directory
+    mode: 0755
+
+- name: Download confset
+  get_url:
+    url: http://docs.opencb.org/download/attachments/9240577/OpenCGAConfSet.tar.gz?version=1&modificationDate=1509374447353&api=v2
+    dest: ~/tmp/OpenCGAConfSet.tar.gz
+
+- name: Extract confset
+  unarchive:
+    src: ~/tmp/OpenCGAConfSet.tar.gz
+    dest: "{{ minimal_storage_solr_conf }}"
+    remote_src: yes
+
+- file:
+    path: "{{ minimal_storage_solr_conf }}"
+    state: directory
+    mode: 0755
+    recurse: yes
+
 - name: Add Solr container
   docker_container:
     name: dev_solr
@@ -28,5 +57,6 @@
     state: started
     volumes:
     - "{{ minimal_storage_solr_data }}:/opt/solr/mydata"
+    - "{{ minimal_storage_solr_conf }}/OpenCGAConfSet:/opt/solr/server/solr/configsets/OpenCGAConfSet"
     published_ports:
     - 8983:8983
