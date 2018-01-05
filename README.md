@@ -11,9 +11,15 @@ To run this set of playbooks, please execute:
 
 You may find this useful to run the above ansible-playbook command:
 
-  virtualenv .venv
-  . .venv/bin/activate
-  pip install -U pip
-  pip install -U ansible docker
+    virtualenv .venv
+    . .venv/bin/activate
+    pip install -U pip
+    pip install -U ansible docker
 
 Note it also assumes the current running user can ssh into localhost.
+
+## Using OpenCGA
+
+See the following URL for where opencga is installed:
+
+    http://localhost:8080/opencga/
