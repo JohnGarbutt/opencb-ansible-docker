@@ -1,6 +1,10 @@
 ---
+- hosts: all[0]
+  roles:
+  - prometheus-server
 - hosts: all
   become: no
   roles:
+  - prometheus-docker-node
   - minimal-storage
   - minimal-opencb-tomcat

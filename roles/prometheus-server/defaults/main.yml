@@ -1,0 +1,6 @@
+---
+prometheus_home: /home/john/prometheus
+grafana_home: /home/john/grafana
+prometheus_server_node_exporters:
+  - "{{ ansible_host }}"
+prometheus_server_cadvisor: "{{ prometheus_server_node_exporters }}"

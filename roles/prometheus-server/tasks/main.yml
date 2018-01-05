@@ -1,0 +1,119 @@
+---
+- name: Create prometheus data dir
+  file:
+    path: "{{ prometheus_home }}/data"
+    state: directory
+    mode: 0755
+
+- name: Configure prometheus targets
+  template:
+    src: prometheus.yml  # TODO - add ip addresses properly
+    dest: "{{ prometheus_home }}/prometheus.yml"
+
+- name: Configure prometheus alerts
+  template:
+    src: alerts.rules
+    dest: "{{ prometheus_home }}/alerts.rules"
+
+- name: Add Prometheus server
+  docker_container:
+    name: prometheus
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - "{{ prometheus_home }}/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "{{ prometheus_home }}/alerts.rules:/etc/prometheus/alerts.rules"
+      - "{{ prometheus_home }}/data:/prometheus prom/prometheus"
+
+- name: Configure graphite mapping
+  template:
+    src: graphite_mapping.conf
+    dest: "{{ prometheus_home }}/graphite_mapping.conf"
+# http://rokroskar.github.io/monitoring-spark-on-hadoop-with-prometheus-and-grafana.html
+
+- name: Add graphite exporter (jmx metrics get sent here)
+  docker_container:
+    name: graphite
+    image: prom/graphite-exporter
+    ports:
+      - 9108:9108
+      - 9109:9109
+      - 9109:9109/udp
+    volumes:
+      - "{{ prometheus_home }}/graphite_mapping.conf:/tmp/graphite_mapping.conf"
+    command: "--graphite.mapping-config=/tmp/graphite_mapping.conf"
+
+- name: Create Grafana dir
+  file:
+    path: "{{ grafana_home }}"
+    state: directory
+    mode: 0755
+
+- name: Add Grafana
+  docker_container:
+    name: grafana
+    image: grafana/grafana
+    ports:
+      - 3000:3000  # TODO - add more config, github OAuth?
+    volumes:
+      - "{{ grafana_home }}:/var/lib/grafana"
+
+- name: check datasource
+  uri:
+    url: "http://{{ ansible_host }}:3000/api/datasources"
+    method: GET
+    user: admin
+    password: admin
+    force_basic_auth: yes
+    return_content: yes
+  register: datasources
+
+- name: Add datasource
+  uri:
+    url: "http://{{ ansible_host }}:3000/api/datasources"
+    method: POST
+    user: admin
+    password: admin
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+    body: '{"name": "Prometheus",
+            "type": "prometheus",
+            "access": "proxy",
+            "url": "http://{{ ansible_host }}:9090",
+            "password": "",
+            "user": "",
+            "basicAuth": false,
+            "basicAuthUser": "",
+            "basicAuthPassword": "",
+            "isDefault": true,
+            "jsonData": null }'
+  when: datasources.json == []
+
+- name: check datasource
+  uri:
+    url: "http://{{ ansible_host }}:3000/api/search?query=Spark"
+    method: GET
+    user: admin
+    password: admin
+    force_basic_auth: yes
+    return_content: yes
+  register: dashboards
+
+- debug:
+    msg: "Return value: {{ dashboards.json }}"
+
+- name: Add dashboard
+  uri:
+    url: "http://{{ ansible_host }}:3000/api/dashboards/db"
+    method: POST
+    user: admin
+    password: admin
+    force_basic_auth: yes
+    status_code: 200
+    body_format: json
+    body:
+      dashboard: '{{ lookup("file","grafana_dashboard.json") }}'
+      overwrite: true
+  when: dashboards.json == []

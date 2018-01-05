@@ -1,0 +1,49 @@
+# {{ ansible_managed }}
+
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+  external_labels:
+      monitor: 'sahara-test'
+
+rule_files:
+  # TODO  - "alerts.rules"
+
+scrape_configs:
+  - job_name: 'prometheus'
+
+    static_configs:
+      - targets:
+        - '{{ ansible_host }}:9090'
+
+  - job_name: 'graphite'
+
+    static_configs:
+      - targets:
+        - '{{ ansible_host }}:9108'
+
+  - job_name: 'node'
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+{% for node in prometheus_server_node_exporters %}
+        - '{{ node }}:9100'
+{% endfor %}
+
+    params:
+      collect[]:
+        - cpu
+        - meminfo
+        - diskstats
+        - netdev
+        - netstat
+        - infiniband
+
+  - job_name: 'cAdvisor'
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+{% for node in prometheus_server_cadvisor %}
+        - '{{ node }}:9080'
+{% endfor %}

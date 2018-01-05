@@ -1,0 +1,24 @@
+---
+- name: Add Prometheus node-exporter
+  docker_container:
+    name: prom-node-exporter
+    image: prom/node-exporter
+    network_mode: host  # TODO should access host fs too
+    pid_mode: host
+    ports:
+      - 9100:9100
+
+- name: Add cAdvisor
+  docker_container:
+    name: cAdvisor
+    image: google/cadvisor
+    privileged: yes
+    detach: yes
+    ports:
+      - 9080:8080  # stop clash with spark master
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /cgroup:/cgroup:ro
