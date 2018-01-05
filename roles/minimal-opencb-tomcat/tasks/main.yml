@@ -1,25 +1,25 @@
 ---
-- name: Ensure opencb dir exists
+- name: Ensure docker dir exists
   file:
-    path: ~/tmp/opencb
+    path: ./opencb-dockerfile
     state: directory
     mode: 0755
 
-- name: Download opencb
-  get_url:
-    url: https://github.com/opencb/opencga/releases/download/v1.2.0/opencga-1.2.0.tar.gz
-    dest: ~/tmp/opencb.tar.gz
+- name: Copy dockerfile
+  template:
+    src: dockerfile.j2
+    dest: ./opencb-dockerfile/dockerfile
 
-- name: Extract opencb binaries
-  unarchive:
-    src: ~/tmp/opencb.tar.gz
-    dest: ~/tmp/opencb
-    remote_src: yes
+- name: Build opencb docker image
+  docker_image:
+    name: opencb-test
+    path: ./opencb-dockerfile
+    tag: v0.1
 
 - name: Add tomcat container
   docker_container:
     name: opencb
-    image: tomcat:8.5-jre8
+    image: opencb-test:v0.1
     state: started
     published_ports:
     - 8080:8080
