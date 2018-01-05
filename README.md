@@ -23,3 +23,10 @@ Note it also assumes the current running user can ssh into localhost.
 See the following URL for where opencga is installed:
 
     http://localhost:8080/opencga/
+
+## Monitoring
+
+* Grafana: http://localhost:3000 (user: admin, password: admin)
+* Prometheus: http://localhost:9090
+* Prometheus node exporter: http://localhost:9100
+* cAdvisor: http://localhost:9080
