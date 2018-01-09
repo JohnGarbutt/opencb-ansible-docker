@@ -114,6 +114,6 @@
     status_code: 200
     body_format: json
     body:
-      dashboard: '{{ lookup("file","grafana_dashboard.json") }}'
+      dashboard: '{{ lookup("file","grafana_dashboard_docker.json") }}'
       overwrite: true
   when: dashboards.json == []
