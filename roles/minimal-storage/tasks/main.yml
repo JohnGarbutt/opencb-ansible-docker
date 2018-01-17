@@ -21,42 +21,29 @@
     state: directory
     mode: 0750
 
-- name: Ensure solr conf dir present
+- name: Ensure dockerfile dir exists
   file:
-    path: "{{ minimal_storage_solr_conf }}"
+    path: ./opencb-solr-dockerfile
     state: directory
     mode: 0755
 
-- name: Ensure solr conf extract dir present
-  file:
-    path: ~/tmp
-    state: directory
-    mode: 0755
+- name: Generate dockerfile
+  template:
+    src: dockerfile.j2
+    dest: ./opencb-solr-dockerfile/dockerfile
 
-- name: Download confset
-  get_url:
-    url: http://docs.opencb.org/download/attachments/9240577/OpenCGAConfSet.tar.gz?version=1&modificationDate=1509374447353&api=v2
-    dest: ~/tmp/OpenCGAConfSet.tar.gz
-
-- name: Extract confset
-  unarchive:
-    src: ~/tmp/OpenCGAConfSet.tar.gz
-    dest: "{{ minimal_storage_solr_conf }}"
-    remote_src: yes
-
-- file:
-    path: "{{ minimal_storage_solr_conf }}"
-    state: directory
-    mode: 0755
-    recurse: yes
+- name: Build opencb-solr docker image
+  docker_image:
+    name: opencb-solr
+    path: ./opencb-solr-dockerfile
+    tag: v0.2
 
 - name: Add Solr container
   docker_container:
     name: dev_solr
-    image: solr:6.4.2
+    image: opencb-solr:v0.2
     state: started
     volumes:
     - "{{ minimal_storage_solr_data }}:/opt/solr/mydata"
-    - "{{ minimal_storage_solr_conf }}/OpenCGAConfSet:/opt/solr/server/solr/configsets/OpenCGAConfSet"
     published_ports:
     - 8983:8983

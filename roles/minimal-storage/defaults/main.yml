@@ -3,3 +3,6 @@ minimal_storage_mongo_data: ~/var/lib/opencb/mongo
 
 minimal_storage_solr_data: ~/var/lib/opencb/solr
 minimal_storage_solr_conf: ~/var/lib/opencb/solr_conf
+
+minimal_storage_opencga_solr_conf_url: http://docs.opencb.org/download/attachments/9240577/OpenCGAConfSet.tar.gz?version=1&modificationDate=1509374447353&api=v2
+
