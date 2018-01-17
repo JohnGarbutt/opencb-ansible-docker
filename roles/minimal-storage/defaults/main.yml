@@ -5,4 +5,5 @@ minimal_storage_solr_data: ~/var/lib/opencb/solr
 minimal_storage_solr_conf: ~/var/lib/opencb/solr_conf
 
 minimal_storage_opencga_solr_conf_url: http://docs.opencb.org/download/attachments/9240577/OpenCGAConfSet.tar.gz?version=1&modificationDate=1509374447353&api=v2
-
+minimal_storage_solr_create: http://{{ ansible_host }}:8983/solr/admin/cores?action=CREATE&name=my-new-core&configSet=OpenCGAConfSet
+minimal_storage_solr_get: http://{{ ansible_host }}:8983/solr/admin/cores

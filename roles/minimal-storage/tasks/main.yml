@@ -47,3 +47,17 @@
     - "{{ minimal_storage_solr_data }}:/opt/solr/mydata"
     published_ports:
     - 8983:8983
+
+- name: check solr cores
+  uri:
+    url: "{{ minimal_storage_solr_get }}"
+    method: GET
+    return_content: yes
+  register: cores
+
+- name: Add solr core
+  uri:
+    url: "{{ minimal_storage_solr_create }}"
+    method: GET
+    status_code: 200
+  when: "not ('my-new-core' in cores.content)"
