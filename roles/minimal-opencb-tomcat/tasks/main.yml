@@ -5,10 +5,15 @@
     state: directory
     mode: 0755
 
-- name: Copy dockerfile
+- name: Generate dockerfile
   template:
     src: dockerfile.j2
     dest: ./opencb-dockerfile/dockerfile
+
+- name: Generate storage config
+  template:
+    src: storage-configuration.yml.j2
+    dest: ./opencb-dockerfile/storage-configuration.yml
 
 - name: Build opencb docker image
   docker_image:
@@ -18,8 +23,24 @@
 
 - name: Add tomcat container
   docker_container:
-    name: opencb
+    name: opencga
     image: opencb-test:v0.1
     state: started
     published_ports:
     - 8080:8080
+    volumes:
+    - "/home/john/opencb-dockerfile/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
+
+#- name: Add tomcat container
+#  docker_container:
+#    name: opencga
+#    image: opencb/opencga
+#    state: started
+#    published_ports:
+#    - 8080:8080
+#
+#- name: Add cellbase container
+#  docker_container:
+#    name: cellbase
+#    image: opencb/cellbase
+#    state: started
