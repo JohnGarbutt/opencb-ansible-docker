@@ -1,3 +1,6 @@
 ---
 mongo_data: ./mongo
 mongo_suffix: defaultdb
+mongo_express_port: 8081
+
+mongo_version: "3.6.1"
