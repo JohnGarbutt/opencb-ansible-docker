@@ -7,24 +7,17 @@ global:
   external_labels:
       monitor: 'sahara-test'
 
-rule_files:
-  # TODO  - "alerts.rules"
+#rule_files:
+#  - "alerts.rules"
 
 scrape_configs:
   - job_name: 'prometheus'
 
     static_configs:
       - targets:
-        - '{{ ansible_host }}:9090'
-
-  - job_name: 'graphite'
-
-    static_configs:
-      - targets:
-        - '{{ ansible_host }}:9108'
+        - 'localhost:9090'
 
   - job_name: 'node'
-    scrape_interval: 15s
     static_configs:
       - targets:
 {% for node in prometheus_server_node_exporters %}
@@ -38,10 +31,8 @@ scrape_configs:
         - diskstats
         - netdev
         - netstat
-        - infiniband
 
   - job_name: 'cAdvisor'
-    scrape_interval: 15s
     static_configs:
       - targets:
 {% for node in prometheus_server_cadvisor %}

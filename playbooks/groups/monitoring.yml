@@ -1,5 +1,9 @@
 ---
 - hosts: monitoring
   roles:
-  - prometheus-server
-  - elastic-server
+    - { role: prometheus-server,
+        prometheus_home: "{{ opencb_root }}/prometheus",
+        grafana_home: "{{ opencb_root }}/grafana",
+        prometheus_server_node_exporters: "{{ groups['all'] }}" }
+    - { role: elastic-server,
+        elastic_server_home: "{{ opencb_root }}/elasticsearch" }

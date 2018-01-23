@@ -3,17 +3,21 @@
   file:
     path: "{{ prometheus_home }}/data"
     state: directory
-    mode: 0755
+    mode: 0777 # TODO...
 
 - name: Configure prometheus targets
   template:
     src: prometheus.yml  # TODO - add ip addresses properly
     dest: "{{ prometheus_home }}/prometheus.yml"
 
-- name: Configure prometheus alerts
-  template:
-    src: alerts.rules
-    dest: "{{ prometheus_home }}/alerts.rules"
+- name: Create prometheus docker network
+  docker_network:
+    name: prometheus
+
+#- name: Configure prometheus alerts
+#  template:
+#    src: alerts.rules
+#    dest: "{{ prometheus_home }}/alerts.rules"
 
 - name: Add Prometheus server
   docker_container:
@@ -23,32 +27,16 @@
       - 9090:9090
     volumes:
       - "{{ prometheus_home }}/prometheus.yml:/etc/prometheus/prometheus.yml"
-      - "{{ prometheus_home }}/alerts.rules:/etc/prometheus/alerts.rules"
       - "{{ prometheus_home }}/data:/prometheus prom/prometheus"
-
-- name: Configure graphite mapping
-  template:
-    src: graphite_mapping.conf
-    dest: "{{ prometheus_home }}/graphite_mapping.conf"
-# http://rokroskar.github.io/monitoring-spark-on-hadoop-with-prometheus-and-grafana.html
-
-- name: Add graphite exporter (jmx metrics get sent here)
-  docker_container:
-    name: graphite
-    image: prom/graphite-exporter
-    ports:
-      - 9108:9108
-      - 9109:9109
-      - 9109:9109/udp
-    volumes:
-      - "{{ prometheus_home }}/graphite_mapping.conf:/tmp/graphite_mapping.conf"
-    command: "--graphite.mapping-config=/tmp/graphite_mapping.conf"
+      #- "{{ prometheus_home }}/alerts.rules:/etc/prometheus/alerts.rules"
+    networks:
+      - name: prometheus
 
 - name: Create Grafana dir
   file:
     path: "{{ grafana_home }}"
     state: directory
-    mode: 0755
+    mode: 0777  # TODO...
 
 - name: Add Grafana
   docker_container:
@@ -58,6 +46,12 @@
       - 3000:3000  # TODO - add more config, github OAuth?
     volumes:
       - "{{ grafana_home }}:/var/lib/grafana"
+    networks:
+      - name: prometheus
+
+- name: Wait 300 seconds for grafana
+  wait_for:
+    port: 3000
 
 - name: check datasource
   uri:
@@ -81,7 +75,7 @@
     body: '{"name": "Prometheus",
             "type": "prometheus",
             "access": "proxy",
-            "url": "http://{{ ansible_host }}:9090",
+            "url": "http://prometheus:9090",
             "password": "",
             "user": "",
             "basicAuth": false,
