@@ -2,4 +2,5 @@
 - hosts: all
   roles:
   - prometheus-docker-node
-  - filebeat-docker
+  - { role: filebeat-docker,
+      filebeat_docker_home: "{{ opencb_root }}/filebeat_docker" }

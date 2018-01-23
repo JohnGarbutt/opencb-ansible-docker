@@ -24,14 +24,6 @@ scrape_configs:
         - '{{ node }}:9100'
 {% endfor %}
 
-    params:
-      collect[]:
-        - cpu
-        - meminfo
-        - diskstats
-        - netdev
-        - netstat
-
   - job_name: 'cAdvisor'
     static_configs:
       - targets:

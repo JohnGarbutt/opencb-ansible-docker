@@ -1,4 +1,4 @@
-FROM docker.elastic.co/beats/filebeat:6.1.1
+FROM docker.elastic.co/beats/filebeat:{{ filebeat_docker_version }}
 USER root
 RUN groupadd docker -g132
 RUN usermod -a -G docker filebeat

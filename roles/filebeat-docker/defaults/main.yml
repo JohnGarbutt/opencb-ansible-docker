@@ -1,0 +1,3 @@
+---
+filebeat_docker_home: "./filebeat-dockerfile"
+filebeat_docker_version: "6.1.2"

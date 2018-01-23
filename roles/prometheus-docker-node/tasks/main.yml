@@ -7,6 +7,15 @@
     pid_mode: host
     ports:
       - 9100:9100
+    volumes:
+      - /sys:/host/sys:ro
+      - /proc:/host/proc:ro
+      - /:/rootfs:ro
+    env:
+      collector.procfs: "/host/proc"
+      collector.sysfs: "/host/sys"
+      collector.filesystem.ignored-mount-points: "^/(sys|proc|dev|host|etc)($|/)"
+    user: root
 
 - name: Add cAdvisor
   docker_container:
