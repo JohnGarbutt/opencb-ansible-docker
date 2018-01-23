@@ -1,5 +1,6 @@
 ---
 opencga_tomcat_docker: ./opencga_docker
+opencga_tomcat_admin_password: changeme
 
 opencga_version: "1.2.0"
 opencga_tomcat_version: "8.5.24"

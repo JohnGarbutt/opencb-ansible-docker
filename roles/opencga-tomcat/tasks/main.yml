@@ -10,6 +10,11 @@
     src: dockerfile.j2
     dest: "{{ opencga_tomcat_docker }}/dockerfile"
 
+- name: Generate catalog config
+  template:
+    src: configuration.yml.j2
+    dest: "{{ opencga_tomcat_docker }}/configuration.yml"
+
 - name: Generate storage config
   template:
     src: storage-configuration.yml.j2
@@ -29,9 +34,13 @@
     published_ports:
       - 8080:8080
     volumes:
+      - "{{ opencga_tomcat_docker }}/configuration.yml:/opt/opencga/conf/configuration.yml"
       - "{{ opencga_tomcat_docker }}/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
     networks:
       - name: "{{ opencga_tomcat_solr }}"
       - name: "{{ opencga_tomcat_mongo_catalog_suffix }}"
       - name: "{{ opencga_tomcat_mongo_alignment_suffix }}"
       - name: "{{ opencga_tomcat_mongo_variant_suffix }}"
+
+- name: install catalog
+  command: 'docker exec opencga /bin/bash -c "/opt/opencga/bin/opencga-admin.sh catalog install --algorithm HS256 --secret-key asdf"'
