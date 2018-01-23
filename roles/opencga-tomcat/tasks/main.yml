@@ -42,5 +42,18 @@
       - name: "{{ opencga_tomcat_mongo_alignment_suffix }}"
       - name: "{{ opencga_tomcat_mongo_variant_suffix }}"
 
+# TODO: fails second time...
 - name: install catalog
   command: 'docker exec opencga /bin/bash -c "/opt/opencga/bin/opencga-admin.sh catalog install --algorithm HS256 --secret-key asdf"'
+
+- name: test login
+  uri:
+    url: http://localhost:8080/opencga-1.2.0/webservices/rest/v1/users/admin/login
+    method: POST
+    body_format: json
+    body: '{ "password": "changeme" }'
+    status_code: 200
+  register: test_login
+
+- debug:
+    msg: "{{ test_login }}"
