@@ -1,0 +1,5 @@
+---
+- hosts: storage
+  tasks:
+    - debug:
+        msg: "TODO - variant and alignment storage"

@@ -1,2 +1,7 @@
 ---
+- import_playbook: playbooks/groups/monitoring.yml
 - import_playbook: playbooks/groups/all.yml
+- import_playbook: playbooks/groups/catalog.yml
+- import_playbook: playbooks/groups/storage.yml
+- import_playbook: playbooks/groups/rest.yml
+- import_playbook: playbooks/groups/daemon.yml

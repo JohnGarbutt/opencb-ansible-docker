@@ -16,6 +16,7 @@
     path: ./opencb-dockerfile-filebeat
     tag: v0.1.2
 
+# TODO - need root and to chown the filebeat.yml file
 - name: Write out filebeat config
   template:
     src: filebeat.yml.j2

@@ -1,12 +1,5 @@
 ---
-- hosts: all[0]
-  roles:
-  - prometheus-server
-  - elastic-server
 - hosts: all
-  become: no
   roles:
   - prometheus-docker-node
   - filebeat-docker
-  - minimal-storage
-  - minimal-opencb-tomcat
