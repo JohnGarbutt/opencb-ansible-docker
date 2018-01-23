@@ -3,9 +3,9 @@ FROM ubuntu:16.04
 # Based on: https://github.com/cmoro-deusto/docker-tomcat8
 MAINTAINER OpenCB
 
-ENV TOMCAT_VERSION 8.5.24
-ENV JAVA_VERSION 8u151-1~webupd8~0
-ENV OPENCGA_VERSION 1.2.0
+ENV TOMCAT_VERSION {{ opencga_tomcat_version }}
+ENV JAVA_VERSION {{ opencga_jdk_version }}
+ENV OPENCGA_VERSION {{ opencga_version }}
 
 # Install dependencies
 RUN apt-get update && \
@@ -37,10 +37,7 @@ RUN wget --quiet https://github.com/opencb/opencga/releases/download/v${OPENCGA_
 tar xzvf /tmp/opencga.tgz -C /opt && \
 mv /opt/opencga-${OPENCGA_VERSION} /opt/opencga && \
 rm /tmp/opencga.tgz && \
-cp /opt/opencga/opencga-${OPENCGA_VERSION}.war /opt/tomcat/webapps/opencga.war
-
-# Add admin/admin user
-# ADD tomcat-users.xml /opt/tomcat/conf/
+cp /opt/opencga/opencga-${OPENCGA_VERSION}.war /opt/tomcat/webapps/opencga-${OPENCGA_VERSION}.war
 
 ENV CATALINA_HOME /opt/tomcat
 ENV PATH $PATH:$CATALINA_HOME/bin

@@ -1,0 +1,5 @@
+---
+- hosts: rest
+  roles:
+    - { role: opencga-tomcat,
+        opencga_tomcat_docker: "{{ opencb_root }}/opencga-docker" }

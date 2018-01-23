@@ -2,6 +2,10 @@
 - hosts: storage
   roles:
     - { role: mongo,
-        mongo_suffix: "mongo_store",
-        mongo_data: "{{ opencb_root }}/mongo_store",
+        mongo_suffix: "alignment",
+        mongo_data: "{{ opencb_root }}/alignment_store",
         mongo_express_port: 8082 }
+    - { role: mongo,
+        mongo_suffix: "variant",
+        mongo_data: "{{ opencb_root }}/variant_store",
+        mongo_express_port: 8083 }

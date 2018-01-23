@@ -1,0 +1,37 @@
+---
+- name: Ensure docker dir exists
+  file:
+    path: "{{ opencga_tomcat_docker }}"
+    state: directory
+    mode: 0755
+
+- name: Generate dockerfile
+  template:
+    src: dockerfile.j2
+    dest: "{{ opencga_tomcat_docker }}/dockerfile"
+
+- name: Generate storage config
+  template:
+    src: storage-configuration.yml.j2
+    dest: "{{ opencga_tomcat_docker }}/storage-configuration.yml"
+
+- name: Build opencb docker image
+  docker_image:
+    name: opencb-test
+    path: "{{ opencga_tomcat_docker }}"
+    tag: v0.2
+
+- name: Add tomcat container
+  docker_container:
+    name: opencga
+    image: opencb-test:v0.2
+    state: started
+    published_ports:
+      - 8080:8080
+    volumes:
+      - "{{ opencga_tomcat_docker }}/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
+    networks:
+      - name: "{{ opencga_tomcat_solr }}"
+      - name: "{{ opencga_tomcat_mongo_catalog_suffix }}"
+      - name: "{{ opencga_tomcat_mongo_alignment_suffix }}"
+      - name: "{{ opencga_tomcat_mongo_variant_suffix }}"

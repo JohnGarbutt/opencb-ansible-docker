@@ -1,0 +1,12 @@
+---
+opencga_tomcat_docker: ./opencga_docker
+
+opencga_version: "1.2.0"
+opencga_tomcat_version: "8.5.24"
+# Take from: https://launchpad.net/~webupd8team/+archive/ubuntu/java
+opencga_jdk_version: "8u161-1~webupd8~0"
+
+opencga_tomcat_solr: solr
+opencga_tomcat_mongo_catalog_suffix: catalog
+opencga_tomcat_mongo_alignment_suffix: alignment
+opencga_tomcat_mongo_variant_suffix: variant

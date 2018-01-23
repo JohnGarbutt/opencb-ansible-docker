@@ -1,4 +1,0 @@
----
-- hosts: rest
-  roles:
-  - minimal-opencb-tomcat
