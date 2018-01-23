@@ -1,0 +1,57 @@
+---
+- name: Ensure solr data dir present
+  file:
+    path: "{{ solr_data }}"
+    state: directory
+    mode: 0750
+
+- name: Ensure dockerfile dir exists
+  file:
+    path: "{{ solr_docker }}"
+    state: directory
+    mode: 0755
+
+- name: Generate dockerfile
+  template:
+    src: dockerfile.j2
+    dest: "{{ solr_docker }}/dockerfile"
+
+- name: Build opencb-solr docker image
+  docker_image:
+    name: opencb-solr
+    path: "{{ solr_docker }}"
+    tag: v0.2
+
+- name: Create docker network
+  docker_network:
+    name: solr
+
+- name: Add Solr container
+  docker_container:
+    name: solr
+    image: opencb-solr:v0.2
+    state: started
+    volumes:
+      - "{{ solr_data }}:/opt/solr/mydata"
+    published_ports:
+      - 8983:8983
+    networks:
+      - name: solr
+
+- name: Wait 300 seconds for solr
+  wait_for:
+    port: 8983
+
+- name: check solr cores
+  uri:
+    url: "{{ solr_get }}"
+    method: GET
+    return_content: yes
+  register: cores
+
+- name: Add solr core
+  uri:
+    url: "{{ solr_create }}"
+    method: GET
+    status_code: 200
+  when: "not ('my-new-core' in cores.content)"

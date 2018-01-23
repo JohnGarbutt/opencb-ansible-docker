@@ -1,4 +1,9 @@
 ---
 - hosts: catalog
   roles:
-  - minimal-storage
+    - { role: mongo,
+        mongo_suffix: "catalog",
+        mongo_data: "{{ opencb_root }}/catalog" }
+    - { role: solr,
+        solr_data: "{{ opencb_root }}/solr",
+        solr_docker: "{{ opencb_root }}/solr-dockerfile" }

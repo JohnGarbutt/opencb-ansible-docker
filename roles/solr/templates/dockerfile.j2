@@ -1,0 +1,5 @@
+FROM solr:{{ solr_version }}
+
+RUN wget --quiet --no-cookies "{{ solr_conf_opencga_url }}" -O /tmp/opencgaconfset.tgz && \
+tar xzvf /tmp/opencgaconfset.tgz -C /opt/solr/server/solr/configsets/ --no-acls && \
+rm /tmp/opencgaconfset.tgz

@@ -1,0 +1,33 @@
+---
+- name: Ensure mongo data dir present
+  file:
+    path: "{{ mongo_data }}"
+    state: directory
+    mode: 0750
+
+- name: Create docker network
+  docker_network:
+    name: "{{ mongo_suffix }}"
+
+- name: Add Mongo container
+  docker_container:
+    name: "mongo-{{ mongo_suffix }}"
+    image: mongo:3.6.1-jessie
+    state: started
+    volumes:
+      - "{{ mongo_data }}:/data/db:rw"
+    published_ports:
+      - 27017:27017
+    networks:
+      - name: "{{ mongo_suffix }}"
+
+- name: Add Mongo container
+  docker_container:
+    name: dev_mongo_express
+    image: mongo-express
+    published_ports:
+      - 8081:8081
+    env:
+      ME_CONFIG_MONGODB_SERVER: "mongo-{{ mongo_suffix }}"
+    networks:
+      - name: "{{ mongo_suffix }}"

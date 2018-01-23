@@ -1,0 +1,9 @@
+---
+solr_data: ./solr_data
+solr_docker: ./solr_docker
+
+solr_version: 6.4.2
+
+solr_conf_opencga_url: http://docs.opencb.org/download/attachments/9240577/OpenCGAConfSet.tar.gz?version=1&modificationDate=1509374447353&api=v2
+solr_create: http://{{ ansible_host }}:8983/solr/admin/cores?action=CREATE&name=my-new-core&configSet=OpenCGAConfSet
+solr_get: http://{{ ansible_host }}:8983/solr/admin/cores
