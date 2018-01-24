@@ -1,19 +1,36 @@
 ---
+- name: Ensure opencga-base docker dir exists
+  file:
+    path: "{{ opencga_tomcat_docker }}/base"
+    state: directory
+    mode: 0755
+
+- name: Generate dockerfile
+  template:
+    src: dockerfile-base.j2
+    dest: "{{ opencga_tomcat_docker }}/base/dockerfile"
+
+- name: Build opencga-base docker image
+  docker_image:
+    name: opencga-base
+    path: "{{ opencga_tomcat_docker }}/base"
+    tag: v0.1
+
 - name: Ensure opencga docker dir exists
   file:
-    path: "{{ opencga_tomcat_docker }}/opencga"
+    path: "{{ opencga_tomcat_docker }}/daemon"
     state: directory
     mode: 0755
 
 - name: Generate dockerfile
   template:
     src: dockerfile-daemon.j2
-    dest: "{{ opencga_tomcat_docker }}/opencga/dockerfile"
+    dest: "{{ opencga_tomcat_docker }}/daemon/dockerfile"
 
-- name: Build opencb-daemon docker image
+- name: Build opencga-daemon docker image
   docker_image:
-    name: opencb-daemon
-    path: "{{ opencga_tomcat_docker }}/opencga"
+    name: opencga-daemon
+    path: "{{ opencga_tomcat_docker }}/daemon"
     tag: v0.1
 
 - name: Ensure docker dir exists
@@ -27,9 +44,9 @@
     src: dockerfile.j2
     dest: "{{ opencga_tomcat_docker }}/tomcat/dockerfile"
 
-- name: Build opencb-tomcat docker image
+- name: Build opencga-tomcat docker image
   docker_image:
-    name: opencb-tomcat
+    name: opencga-tomcat
     path: "{{ opencga_tomcat_docker }}/tomcat"
     tag: v0.1
 
@@ -46,7 +63,7 @@
 - name: Add tomcat container
   docker_container:
     name: opencga
-    image: opencb-tomcat:v0.1
+    image: opencga-tomcat:v0.1
     state: started
     published_ports:
       - 8080:8080
@@ -62,7 +79,7 @@
 - name: Add daemon container
   docker_container:
     name: opencga-daemon
-    image: opencb-daemon:v0.1
+    image: opencga-daemon:v0.1
     state: started
     volumes:
       - "{{ opencga_tomcat_docker }}/configuration.yml:/opt/opencga/conf/configuration.yml"
