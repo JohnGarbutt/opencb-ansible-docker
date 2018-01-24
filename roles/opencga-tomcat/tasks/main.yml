@@ -1,14 +1,37 @@
 ---
+- name: Ensure opencga docker dir exists
+  file:
+    path: "{{ opencga_tomcat_docker }}/opencga"
+    state: directory
+    mode: 0755
+
+- name: Generate dockerfile
+  template:
+    src: dockerfile-daemon.j2
+    dest: "{{ opencga_tomcat_docker }}/opencga/dockerfile"
+
+- name: Build opencb-daemon docker image
+  docker_image:
+    name: opencb-daemon
+    path: "{{ opencga_tomcat_docker }}/opencga"
+    tag: v0.1
+
 - name: Ensure docker dir exists
   file:
-    path: "{{ opencga_tomcat_docker }}"
+    path: "{{ opencga_tomcat_docker }}/tomcat"
     state: directory
     mode: 0755
 
 - name: Generate dockerfile
   template:
     src: dockerfile.j2
-    dest: "{{ opencga_tomcat_docker }}/dockerfile"
+    dest: "{{ opencga_tomcat_docker }}/tomcat/dockerfile"
+
+- name: Build opencb-tomcat docker image
+  docker_image:
+    name: opencb-tomcat
+    path: "{{ opencga_tomcat_docker }}/tomcat"
+    tag: v0.1
 
 - name: Generate catalog config
   template:
@@ -20,19 +43,27 @@
     src: storage-configuration.yml.j2
     dest: "{{ opencga_tomcat_docker }}/storage-configuration.yml"
 
-- name: Build opencb docker image
-  docker_image:
-    name: opencb-test
-    path: "{{ opencga_tomcat_docker }}"
-    tag: v0.2
-
 - name: Add tomcat container
   docker_container:
     name: opencga
-    image: opencb-test:v0.2
+    image: opencb-tomcat:v0.1
     state: started
     published_ports:
       - 8080:8080
+    volumes:
+      - "{{ opencga_tomcat_docker }}/configuration.yml:/opt/opencga/conf/configuration.yml"
+      - "{{ opencga_tomcat_docker }}/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
+    networks:
+      - name: "{{ opencga_tomcat_solr }}"
+      - name: "{{ opencga_tomcat_mongo_catalog_suffix }}"
+      - name: "{{ opencga_tomcat_mongo_alignment_suffix }}"
+      - name: "{{ opencga_tomcat_mongo_variant_suffix }}"
+
+- name: Add daemon container
+  docker_container:
+    name: opencga-daemon
+    image: opencb-daemon:v0.1
+    state: started
     volumes:
       - "{{ opencga_tomcat_docker }}/configuration.yml:/opt/opencga/conf/configuration.yml"
       - "{{ opencga_tomcat_docker }}/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
