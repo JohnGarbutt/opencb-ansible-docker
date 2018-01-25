@@ -72,6 +72,8 @@
       - name: "{{ opencga_tomcat_mongo_catalog_suffix }}"
       - name: "{{ opencga_tomcat_mongo_alignment_suffix }}"
       - name: "{{ opencga_tomcat_mongo_variant_suffix }}"
+    env:
+      ADMIN_PASSWORD: "{{ opencga_tomcat_admin_password }}"
 
 # TODO: fails second time...
 - name: install catalog

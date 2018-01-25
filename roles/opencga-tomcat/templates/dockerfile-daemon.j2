@@ -32,4 +32,4 @@ rm /tmp/opencga.tgz
 WORKDIR /opt/opencga
 
 # Launch opencga daemon
-CMD ["/opt/opencga/bin/opencga-admin.sh", "catalog", "daemon", "--start"]
+CMD /bin/bash -c "/opt/opencga/bin/opencga-admin.sh catalog daemon --start -p <<< $ADMIN_PASSWORD"
