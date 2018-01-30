@@ -43,6 +43,12 @@
     src: storage-configuration.yml.j2
     dest: "{{ opencga_tomcat_docker }}/storage-configuration.yml"
 
+- name: Generate tutorial script
+  template:
+    src: tutorial.sh.j2
+    dest: "{{ opencga_tomcat_docker }}/tutorial.sh"
+    mode: 0755
+
 - name: Add tomcat container
   docker_container:
     name: opencga
@@ -53,6 +59,7 @@
     volumes:
       - "{{ opencga_tomcat_docker }}/configuration.yml:/opt/opencga/conf/configuration.yml"
       - "{{ opencga_tomcat_docker }}/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
+      - "{{ opencga_tomcat_docker }}/tutorial.sh:/opt/opencga/bin/tutorial.sh"
     networks:
       - name: "{{ opencga_tomcat_solr }}"
       - name: "{{ opencga_tomcat_mongo_catalog_suffix }}"
@@ -75,16 +82,19 @@
     env:
       ADMIN_PASSWORD: "{{ opencga_tomcat_admin_password }}"
 
-# TODO: fails second time...
+# TODO: these both fails second time...
 - name: install catalog
   command: 'docker exec opencga /bin/bash -c "/opt/opencga/bin/opencga-admin.sh catalog install --algorithm HS256 --secret-key asdf"'
+
+- name: Create test user
+  command: 'docker exec opencga /bin/bash -c "/opt/opencga/bin/opencga-admin.sh users create -u test --email test@example.com --name Test --user-password test -p <<< {{ opencga_tomcat_admin_password }}"'
 
 - name: test login
   uri:
     url: http://localhost:8080/opencga-1.2.0/webservices/rest/v1/users/admin/login
     method: POST
     body_format: json
-    body: '{ "password": "changeme" }'
+    body: '{ "password": "{{ opencga_tomcat_admin_password }}" }'
     status_code: 200
   register: test_login
 
