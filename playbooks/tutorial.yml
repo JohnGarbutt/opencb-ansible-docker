@@ -2,4 +2,4 @@
 - hosts: rest
   tasks:
     - name: Run the tutorial
-      command: 'docker exec opencga /bin/bash -c "/opt/opencga/bin/tutorial.sh"'
+      command: 'docker exec opencga-daemon /bin/bash -c "/opt/opencga/bin/tutorial.sh"'
