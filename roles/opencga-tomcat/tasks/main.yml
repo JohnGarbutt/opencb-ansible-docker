@@ -49,6 +49,10 @@
     dest: "{{ opencga_tomcat_docker }}/tutorial.sh"
     mode: 0755
 
+- name: Create a volume for opencga sessions
+  docker_volume:
+    name: opencga_sessions
+
 - name: Add tomcat container
   docker_container:
     name: opencga
@@ -59,6 +63,7 @@
     volumes:
       - "{{ opencga_tomcat_docker }}/configuration.yml:/opt/opencga/conf/configuration.yml"
       - "{{ opencga_tomcat_docker }}/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
+      - "opencga_sessions:/opt/opencga/sessions:z"
     networks:
       - name: "{{ opencga_tomcat_solr }}"
       - name: "{{ opencga_tomcat_mongo_catalog_suffix }}"
@@ -74,6 +79,7 @@
       - "{{ opencga_tomcat_docker }}/configuration.yml:/opt/opencga/conf/configuration.yml"
       - "{{ opencga_tomcat_docker }}/storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
       - "{{ opencga_tomcat_docker }}/tutorial.sh:/opt/opencga/bin/tutorial.sh"
+      - "opencga_sessions:/opt/opencga/sessions:z"
     networks:
       - name: "{{ opencga_tomcat_solr }}"
       - name: "{{ opencga_tomcat_mongo_catalog_suffix }}"
