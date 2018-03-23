@@ -2,3 +2,14 @@
 ansible_connection: local
 ansible_user: centos
 opencb_root: "/home/{{ ansible_user }}/opencb"
+
+openstack_cloud_config: |
+  ---
+  clouds:
+    mycloud:
+      auth:
+        auth_url: https://vss.cloud.private.cam.ac.uk:5000/v3
+        project_name: opencb-dev
+        username: jmfg2
+        password: "todo-vault-encrypt-real-details"
+      region: regionOne
