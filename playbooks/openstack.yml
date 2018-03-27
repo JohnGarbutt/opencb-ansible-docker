@@ -15,7 +15,7 @@
         floating_net: "CUDN-Private"
   roles:
     - role: stackhpc.os-config
-      os_config_content: "{{ my_cloud_config }}"
+      os_config_content: "{{ openstack_cloud_config }}"
     - role: stackhpc.os-shade
       os_shade_venv: "~/os-shade-venv"
     - role: stackhpc.cluster-infra
