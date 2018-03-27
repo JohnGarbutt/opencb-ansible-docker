@@ -15,6 +15,7 @@ You may find this useful to run the above ansible-playbook command:
     . .venv/bin/activate
     pip install -U pip
     pip install -U ansible docker
+    ansible-galaxy install -r requirements.yml
 
 Note it also assumes the current running user can ssh into localhost.
 
