@@ -1,19 +1,18 @@
 ---
 - hosts: rest
-    vars:
-      tomcat_cluster:
-        - name: "tomcat"
-          flavor: "C1.vss.small"
-          image: "CentOS 7.4"
-          num_nodes: 1
-          floating_net: "CUDN-Internet"
-       storage_cluster:
-         - name: "storage"
-           flavor: "C1.vss.small"
-           image: "CentOS 7.4"
-           num_nodes: 1
-           floating_net: "CUDN-Private"
-
+  vars:
+    tomcat_cluster:
+      - name: "tomcat"
+        flavor: "C1.vss.small"
+        image: "CentOS 7.4"
+        num_nodes: 1
+        floating_net: "CUDN-Internet"
+    storage_cluster:
+      - name: "storage"
+        flavor: "C1.vss.small"
+        image: "CentOS 7.4"
+        num_nodes: 1
+        floating_net: "CUDN-Private"
   roles:
     - role: stackhpc.os-config
       os_config_content: "{{ my_cloud_config }}"
