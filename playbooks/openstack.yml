@@ -17,10 +17,10 @@
     - role: stackhpc.os-config
       os_config_content: "{{ openstack_cloud_config }}"
     - role: stackhpc.os-shade
-      os_shade_venv: "~/os-shade-venv"
+      os_shade_venv: "/home/{{ ansible_user }}/os-shade-venv"
     - role: stackhpc.cluster-infra
       cluster_name: "opencb"
-      cluster_venv: "~/os-shade-venv"
+      cluster_venv: "/home/{{ ansible_user }}/os-shade-venv"
       cluster_params:
         cluster_prefix: "opencb"
         cluster_keypair: "usual"
