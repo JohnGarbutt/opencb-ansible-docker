@@ -27,6 +27,9 @@
         cluster_net:
           - net: "opencb"
             subnet: "opencb"
+            security_groups:
+              - "default"
+        security_groups_set_flag: true
         cluster_groups:
           - "{{ tomcat_cluster }}"
           - "{{ storage_cluster }}"
