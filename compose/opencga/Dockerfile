@@ -23,6 +23,9 @@ rm -rf /var/cache/oracle-jdk8-installer
 # Define commonly used JAVA_HOME variable
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
+# Install envsubst
+RUN apt-get update && apt-get install -y gettext
+
 # Get opencga
 ENV OPENCGA_VERSION "1.2.0"
 
@@ -32,5 +35,21 @@ mv /opt/opencga-${OPENCGA_VERSION} /opt/opencga && \
 rm /tmp/opencga.tgz
 
 WORKDIR /opt/opencga
+
+ENV ADMIN_PASSWORD password
+ENV MONGO_CATALOG "mongo-catalog:27017"
+ENV MONGO_STORE "mongo-store:27017"
+ENV SOLR_HOST "http://solr:8989/solr/"
+ENV OPENCGA_HOST "opencga-tomcat"
+
+COPY configuration.yml /opt/opencga/conf/configuration.yml.tmp
+COPY storage-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
+COPY client-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
+COPY tutorial.sh /opt/opencga/bin/tutorial.sh
+
+# TODO: add into entrypoint
+RUN cat /opt/opencga/conf/configuration.yml.tmp | envsubst > /opt/opencga/conf/configuration.yml
+RUN cat /opt/opencga/conf/storage-configuration.yml.tmp | envsubst > /opt/opencga/conf/storage-configuration.yml
+RUN cat /opt/opencga/conf/client-configuration.yml.tmp | envsubst > /opt/opencga/conf/client-configuration.yml
 
 CMD /bin/bash -c "/opt/opencga/bin/opencga-admin.sh catalog daemon --start -p <<< $ADMIN_PASSWORD"

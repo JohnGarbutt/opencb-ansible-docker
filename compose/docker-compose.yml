@@ -15,12 +15,11 @@ networks:
 services:
     opencga-tomcat:
         build: ./opencga-tomcat
+        hostname: opencga-tomcat
         ports:
           - 8080:8080
         volumes:
           - "opencga_sessions:/opt/opencga/sessions:z"
-          #- "./configuration.yml:/opt/opencga/conf/configuration.yml"
-          #- "./storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
         networks:
           - "client"
           - "solr"
@@ -34,9 +33,6 @@ services:
         build: ./opencga
         volumes:
           - "opencga_sessions:/opt/opencga/sessions:z"
-          - "./tutorial.sh:/opt/opencga/bin/tutorial.sh"
-          # - "./configuration.yml:/opt/opencga/conf/configuration.yml"
-          #- "./storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
         networks:
           - "solr"
           - "mongo_catalog"
@@ -47,29 +43,28 @@ services:
           - opencga-tomcat
     opencga-client:
         build: ./opencga
-        depends_on:
-          - opencga-tomcat
         command:
           - /bin/bash
         networks:
           - "client"
-        #volumes:
-        # - "./client-configuration.yml:/opt/opencga/conf/client-configuration.yml"
+        depends_on:
+          - opencga-tomcat
     solr:
         build: ./opencga-solr
+        hostname: solr
         volumes:
           - "solr_data:/opt/solr/mydata"
-        expose:
-          - 8983
         networks:
           - solr
     mongo_catalog:
+        hostname: mongo-catalog
         image: mongo:3.6.1-jessie
         volumes:
             - mongo_catalog_data:/data/db:rw
         networks:
           - "mongo_catalog"
     mongo_store:
+        hostname: mongo-store
         image: mongo:3.6.1-jessie
         volumes:
             - mongo_store_data:/data/db:rw

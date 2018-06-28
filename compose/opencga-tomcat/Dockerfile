@@ -23,6 +23,9 @@ rm -rf /var/cache/oracle-jdk8-installer
 # Define commonly used JAVA_HOME variable
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
+# Install envsubst
+RUN apt-get update && apt-get install -y gettext
+
 # Get Tomcat
 ENV TOMCAT_VERSION "8.5.32"
 
@@ -47,9 +50,22 @@ ENV CATALINA_HOME /opt/tomcat
 ENV PATH $PATH:$CATALINA_HOME/bin
 
 EXPOSE 8080
+EXPOSE 9091
 VOLUME "/opt/tomcat/webapps"
 
 WORKDIR /opt/tomcat
+
+ENV ADMIN_PASSWORD password
+ENV MONGO_CATALOG "mongo-catalog:27017"
+ENV MONGO_STORE "mongo-store:27017"
+ENV SOLR_HOST "http://solr:8989/solr/"
+
+COPY configuration.yml /opt/opencga/conf/configuration.yml.tmp
+COPY storage-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
+
+# TODO: add into entrypoint
+RUN cat /opt/opencga/conf/configuration.yml.tmp | envsubst > /opt/opencga/conf/configuration.yml
+RUN cat /opt/opencga/conf/storage-configuration.yml.tmp | envsubst > /opt/opencga/conf/storage-configuration.yml
 
 # Launch Tomcat
 CMD ["/opt/tomcat/bin/catalina.sh", "run"]
