@@ -5,7 +5,16 @@
 
 set -eux
 
+# let the system startup
+sleep 30
+
 cd /opt/opencga/bin
+
+echo Install catalog
+/opt/opencga/bin/opencga-admin.sh catalog install --algorithm HS256 --secret-key $SECRET_KEY
+
+echo Create test user
+/opt/opencga/bin/opencga-admin.sh users create -u test --email test@example.com --name Test --user-password test -p <<< $ADMIN_PASSWORD
 
 ./opencga.sh users login -u test -p <<< test
 

@@ -13,9 +13,9 @@ networks:
     client:
 
 services:
-    opencga-tomcat:
+    opencga_tomcat:
         build: ./opencga-tomcat
-        hostname: opencga-tomcat
+        hostname: opencga_tomcat
         ports:
           - 8080:8080
         volumes:
@@ -29,7 +29,7 @@ services:
           - solr
           - mongo_catalog
           - mongo_store
-    opencga-daemon:
+    opencga_daemon:
         build: ./opencga
         volumes:
           - "opencga_sessions:/opt/opencga/sessions:z"
@@ -40,15 +40,18 @@ services:
         environment:
             - ADMIN_PASSWORD="secret_admin_password"
         depends_on:
-          - opencga-tomcat
-    opencga-client:
+          - opencga_tomcat
+          - solr
+          - mongo_catalog
+          - mongo_store
+    opencga_client:
         build: ./opencga
         command:
-          - /bin/bash
+          - /opt/opencga/bin/tutorial.sh
         networks:
           - "client"
         depends_on:
-          - opencga-tomcat
+          - opencga_tomcat
     solr:
         build: ./opencga-solr
         hostname: solr
@@ -57,14 +60,14 @@ services:
         networks:
           - solr
     mongo_catalog:
-        hostname: mongo-catalog
+        hostname: mongo_catalog
         image: mongo:3.6.1-jessie
         volumes:
             - mongo_catalog_data:/data/db:rw
         networks:
           - "mongo_catalog"
     mongo_store:
-        hostname: mongo-store
+        hostname: mongo_store
         image: mongo:3.6.1-jessie
         volumes:
             - mongo_store_data:/data/db:rw

@@ -5,7 +5,7 @@ FROM ubuntu:16.04
 MAINTAINER OpenCB
 
 # Take from: https://launchpad.net/~webupd8team/+archive/ubuntu/java
-ENV JAVA_VERSION "8u171-1~webupd8~0"
+ARG JAVA_VERSION="8u171-1~webupd8~0"
 
 # Install dependencies
 RUN apt-get update && \
@@ -27,7 +27,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 RUN apt-get update && apt-get install -y gettext
 
 # Get Tomcat
-ENV TOMCAT_VERSION "8.5.32"
+ARG TOMCAT_VERSION="8.5.32"
 
 RUN wget --quiet --no-cookies http://www-eu.apache.org/dist/tomcat/tomcat-8/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz -O /tmp/tomcat.tgz && \
 tar xzvf /tmp/tomcat.tgz -C /opt && \
@@ -38,7 +38,7 @@ rm -rf /opt/tomcat/webapps/docs && \
 rm -rf /opt/tomcat/webapps/ROOT
 
 # Get opencga
-ENV OPENCGA_VERSION "1.2.0"
+ARG OPENCGA_VERSION="1.2.0"
 
 RUN wget --quiet https://github.com/opencb/opencga/releases/download/v${OPENCGA_VERSION}/opencga-${OPENCGA_VERSION}.tar.gz -O /tmp/opencga.tgz && \
 tar xzvf /tmp/opencga.tgz -C /opt && \
@@ -55,15 +55,18 @@ VOLUME "/opt/tomcat/webapps"
 
 WORKDIR /opt/tomcat
 
-ENV ADMIN_PASSWORD password
-ENV MONGO_CATALOG "mongo-catalog:27017"
-ENV MONGO_STORE "mongo-store:27017"
-ENV SOLR_HOST "http://solr:8989/solr/"
+ARG ADMIN_PASSWORD=secret_admin_password
+ARG SECRET_KEY=super_secret_key
+
+ARG MONGO_CATALOG="mongo_catalog:27017"
+ARG MONGO_STORE="mongo_store:27017"
+ARG SOLR_HOST="http://solr:8989/solr/"
 
 COPY configuration.yml /opt/opencga/conf/configuration.yml.tmp
 COPY storage-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
 
 # TODO: add into entrypoint
+RUN cp -r /opt/opencga/conf /opt/opencga/conf.orig
 RUN cat /opt/opencga/conf/configuration.yml.tmp | envsubst > /opt/opencga/conf/configuration.yml
 RUN cat /opt/opencga/conf/storage-configuration.yml.tmp | envsubst > /opt/opencga/conf/storage-configuration.yml
 

@@ -5,7 +5,7 @@ FROM ubuntu:16.04
 MAINTAINER OpenCB
 
 # Take from: https://launchpad.net/~webupd8team/+archive/ubuntu/java
-ENV JAVA_VERSION "8u171-1~webupd8~0"
+ARG JAVA_VERSION="8u171-1~webupd8~0"
 
 # Install dependencies
 RUN apt-get update && \
@@ -27,7 +27,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 RUN apt-get update && apt-get install -y gettext
 
 # Get opencga
-ENV OPENCGA_VERSION "1.2.0"
+ARG OPENCGA_VERSION="1.2.0"
 
 RUN wget --quiet https://github.com/opencb/opencga/releases/download/v${OPENCGA_VERSION}/opencga-${OPENCGA_VERSION}.tar.gz -O /tmp/opencga.tgz && \
 tar xzvf /tmp/opencga.tgz -C /opt && \
@@ -36,20 +36,25 @@ rm /tmp/opencga.tgz
 
 WORKDIR /opt/opencga
 
-ENV ADMIN_PASSWORD password
-ENV MONGO_CATALOG "mongo-catalog:27017"
-ENV MONGO_STORE "mongo-store:27017"
-ENV SOLR_HOST "http://solr:8989/solr/"
-ENV OPENCGA_HOST "opencga-tomcat"
+ARG ADMIN_PASSWORD=secret_admin_password
+ARG SECRET_KEY=super_secret_key
+
+ARG MONGO_CATALOG="mongo_catalog:27017"
+ARG MONGO_STORE="mongo_store:27017"
+ARG SOLR_HOST="http://solr:8989/solr/"
+ARG OPENCGA_HOST="opencga_tomcat"
 
 COPY configuration.yml /opt/opencga/conf/configuration.yml.tmp
 COPY storage-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
-COPY client-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
-COPY tutorial.sh /opt/opencga/bin/tutorial.sh
+COPY client-configuration.yml /opt/opencga/conf/client-configuration.yml.tmp
+COPY tutorial.sh /opt/opencga/bin/tutorial.sh.tmp
 
 # TODO: add into entrypoint
+RUN cp -r /opt/opencga/conf /opt/opencga/conf.orig
 RUN cat /opt/opencga/conf/configuration.yml.tmp | envsubst > /opt/opencga/conf/configuration.yml
 RUN cat /opt/opencga/conf/storage-configuration.yml.tmp | envsubst > /opt/opencga/conf/storage-configuration.yml
 RUN cat /opt/opencga/conf/client-configuration.yml.tmp | envsubst > /opt/opencga/conf/client-configuration.yml
+RUN cat /opt/opencga/bin/tutorial.sh.tmp | envsubst > /opt/opencga/bin/tutorial.sh
+RUN chmod +x /opt/opencga/bin/tutorial.sh
 
 CMD /bin/bash -c "/opt/opencga/bin/opencga-admin.sh catalog daemon --start -p <<< $ADMIN_PASSWORD"
