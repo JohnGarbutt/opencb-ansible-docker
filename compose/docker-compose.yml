@@ -1,0 +1,83 @@
+---
+version: '3'
+volumes:
+    opencga-sessions:
+    mongo-catalog-data:
+    mongo-store-data:
+    solr-data:
+
+networks:
+    solr:
+    mongo-catalog:
+    mongo-store:
+    client:
+
+services:
+    opencga-tomcat:
+        build: ./opencga-tomcat
+        hostname: opencga-tomcat
+        ports:
+          - 8080:8080
+        volumes:
+          - "opencga-sessions:/opt/opencga/sessions:z"
+        networks:
+          - "client"
+          - "solr"
+          - "mongo-catalog"
+          - "mongo-store"
+        depends_on:
+          - solr
+          - mongo-catalog
+          - mongo-store
+
+    opencga-daemon:
+        build: ./opencga
+        volumes:
+          - "opencga-sessions:/opt/opencga/sessions:z"
+        networks:
+          - "solr"
+          - "mongo-catalog"
+          - "mongo-store"
+        environment:
+            - ADMIN_PASSWORD="secret-admin-password"
+        depends_on:
+          - opencga-tomcat
+          - solr
+          - mongo-catalog
+          - mongo-store
+
+    opencga-client:
+        build: ./opencga
+        command:
+          - /opt/opencga/bin/tutorial.sh
+        networks:
+          - "client"
+          - "mongo-catalog"
+          - "mongo-store"
+        environment:
+            - ADMIN_PASSWORD="secret-admin-password"
+        depends_on:
+          - opencga-tomcat
+
+    solr:
+        build: ./opencga-solr
+        hostname: solr
+        volumes:
+          - "solr-data:/opt/solr/mydata"
+        networks:
+          - solr
+    mongo-catalog:
+        hostname: mongo-catalog
+        image: mongo:3.6.1-jessie
+        volumes:
+            - mongo-catalog-data:/data/db:rw
+        networks:
+          - "mongo-catalog"
+            
+    mongo-store:
+        hostname: mongo-store
+        image: mongo:3.6.1-jessie
+        volumes:
+            - mongo-store-data:/data/db:rw
+        networks:
+          - "mongo-store"

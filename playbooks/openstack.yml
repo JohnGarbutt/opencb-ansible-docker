@@ -1,0 +1,51 @@
+---
+- hosts: rest
+  vars:
+    tomcat_cluster:
+      - name: "tomcat"
+        flavor: "C1.vss.small"
+        image: "CentOS 7.4"
+        num_nodes: 1
+        floating_net: "CUDN-Internet"
+    storage_cluster:
+      - name: "storage"
+        flavor: "C1.vss.small"
+        image: "CentOS 7.4"
+        num_nodes: 1
+        floating_net: "CUDN-Private"
+  roles:
+    - role: stackhpc.os-config
+      os_config_content: "{{ openstack_cloud_config }}"
+    - role: stackhpc.os-shade
+      os_shade_venv: "/home/{{ ansible_user }}/os-shade-venv"
+    - role: stackhpc.cluster-infra
+      cluster_name: "opencb"
+      cluster_venv: "/home/{{ ansible_user }}/os-shade-venv"
+      cluster_params:
+        cluster_prefix: "opencb"
+        cluster_keypair: "usual"
+        cluster_net:
+          - net: "opencb"
+            subnet: "opencb"
+            security_groups:
+              - "default"
+        security_groups_set_flag: true
+        cluster_groups:
+          - "{{ tomcat_cluster }}"
+          - "{{ storage_cluster }}"
+        # Map cluster_groups to inventory groups
+        cluster_roles:
+          - name: "rest"
+            groups: "{{ tomcat_cluster }}"
+          - name: "daemon"
+            groups: "{{ tomcat_cluster }}"
+          - name: "monitoring"
+            groups: "{{ tomcat_cluster }}"
+          - name: "storage"
+            groups: "{{ storage_cluster }}"
+          - name: "catalog"
+            groups: "{{ storage_cluster }}"
+      cluster_group_vars:
+        all:
+          ansible_user: centos
+          opencb_root: "/home/{{ ansible_user }}/opencb"
