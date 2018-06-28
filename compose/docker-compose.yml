@@ -1,79 +1,83 @@
 ---
 version: '3'
 volumes:
-    opencga_sessions:
-    mongo_catalog_data:
-    mongo_store_data:
-    solr_data:
+    opencga-sessions:
+    mongo-catalog-data:
+    mongo-store-data:
+    solr-data:
 
 networks:
     solr:
-    mongo_catalog:
-    mongo_store:
+    mongo-catalog:
+    mongo-store:
     client:
 
 services:
-    opencga_tomcat:
+    opencga-tomcat:
         build: ./opencga-tomcat
-        hostname: opencga_tomcat
+        hostname: opencga-tomcat
         ports:
           - 8080:8080
         volumes:
-          - "opencga_sessions:/opt/opencga/sessions:z"
+          - "opencga-sessions:/opt/opencga/sessions:z"
         networks:
           - "client"
           - "solr"
-          - "mongo_catalog"
-          - "mongo_store"
+          - "mongo-catalog"
+          - "mongo-store"
         depends_on:
           - solr
-          - mongo_catalog
-          - mongo_store
-    opencga_daemon:
+          - mongo-catalog
+          - mongo-store
+
+    opencga-daemon:
         build: ./opencga
         volumes:
-          - "opencga_sessions:/opt/opencga/sessions:z"
+          - "opencga-sessions:/opt/opencga/sessions:z"
         networks:
           - "solr"
-          - "mongo_catalog"
-          - "mongo_store"
+          - "mongo-catalog"
+          - "mongo-store"
         environment:
-            - ADMIN_PASSWORD="secret_admin_password"
+            - ADMIN_PASSWORD="secret-admin-password"
         depends_on:
-          - opencga_tomcat
+          - opencga-tomcat
           - solr
-          - mongo_catalog
-          - mongo_store
-    opencga_client:
+          - mongo-catalog
+          - mongo-store
+
+    opencga-client:
         build: ./opencga
         command:
           - /opt/opencga/bin/tutorial.sh
         networks:
           - "client"
-          - "mongo_catalog"
-          - "mongo_store"
+          - "mongo-catalog"
+          - "mongo-store"
         environment:
-            - ADMIN_PASSWORD="secret_admin_password"
+            - ADMIN_PASSWORD="secret-admin-password"
         depends_on:
-          - opencga_tomcat
+          - opencga-tomcat
+
     solr:
         build: ./opencga-solr
         hostname: solr
         volumes:
-          - "solr_data:/opt/solr/mydata"
+          - "solr-data:/opt/solr/mydata"
         networks:
           - solr
-    mongo_catalog:
-        hostname: mongo_catalog
+    mongo-catalog:
+        hostname: mongo-catalog
         image: mongo:3.6.1-jessie
         volumes:
-            - mongo_catalog_data:/data/db:rw
+            - mongo-catalog-data:/data/db:rw
         networks:
-          - "mongo_catalog"
-    mongo_store:
-        hostname: mongo_store
+          - "mongo-catalog"
+            
+    mongo-store:
+        hostname: mongo-store
         image: mongo:3.6.1-jessie
         volumes:
-            - mongo_store_data:/data/db:rw
+            - mongo-store-data:/data/db:rw
         networks:
-          - "mongo_store"
+          - "mongo-store"

@@ -36,13 +36,13 @@ rm /tmp/opencga.tgz
 
 WORKDIR /opt/opencga
 
-ARG ADMIN_PASSWORD=secret_admin_password
-ARG SECRET_KEY=super_secret_key
+ARG ADMIN_PASSWORD=secret-admin-password
+ARG SECRET_KEY=super-secret-key
 
-ARG MONGO_CATALOG="mongo_catalog:27017"
-ARG MONGO_STORE="mongo_store:27017"
+ARG MONGO_CATALOG="mongo-catalog:27017"
+ARG MONGO_STORE="mongo-store:27017"
 ARG SOLR_HOST="http://solr:8989/solr/"
-ARG OPENCGA_HOST="opencga_tomcat"
+ARG OPENCGA_HOST="opencga-tomcat"
 
 COPY configuration.yml /opt/opencga/conf/configuration.yml.tmp
 COPY storage-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
