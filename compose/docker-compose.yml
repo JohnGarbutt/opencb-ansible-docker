@@ -1,0 +1,77 @@
+---
+version: '3'
+volumes:
+    opencga_sessions:
+    mongo_catalog_data:
+    mongo_store_data:
+    solr_data:
+
+networks:
+    solr:
+    mongo_catalog:
+    mongo_store:
+    client:
+
+services:
+    opencga-tomcat:
+        build: ./opencga-tomcat
+        ports:
+          - 8080:8080
+        volumes:
+          - "opencga_sessions:/opt/opencga/sessions:z"
+          #- "./configuration.yml:/opt/opencga/conf/configuration.yml"
+          #- "./storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
+        networks:
+          - "client"
+          - "solr"
+          - "mongo_catalog"
+          - "mongo_store"
+        depends_on:
+          - solr
+          - mongo_catalog
+          - mongo_store
+    opencga-daemon:
+        build: ./opencga
+        volumes:
+          - "opencga_sessions:/opt/opencga/sessions:z"
+          - "./tutorial.sh:/opt/opencga/bin/tutorial.sh"
+          # - "./configuration.yml:/opt/opencga/conf/configuration.yml"
+          #- "./storage-configuration.yml:/opt/opencga/conf/storage-configuration.yml"
+        networks:
+          - "solr"
+          - "mongo_catalog"
+          - "mongo_store"
+        environment:
+            - ADMIN_PASSWORD="secret_admin_password"
+        depends_on:
+          - opencga-tomcat
+    opencga-client:
+        build: ./opencga
+        depends_on:
+          - opencga-tomcat
+        command:
+          - /bin/bash
+        networks:
+          - "client"
+        #volumes:
+        # - "./client-configuration.yml:/opt/opencga/conf/client-configuration.yml"
+    solr:
+        build: ./opencga-solr
+        volumes:
+          - "solr_data:/opt/solr/mydata"
+        expose:
+          - 8983
+        networks:
+          - solr
+    mongo_catalog:
+        image: mongo:3.6.1-jessie
+        volumes:
+            - mongo_catalog_data:/data/db:rw
+        networks:
+          - "mongo_catalog"
+    mongo_store:
+        image: mongo:3.6.1-jessie
+        volumes:
+            - mongo_store_data:/data/db:rw
+        networks:
+          - "mongo_store"
