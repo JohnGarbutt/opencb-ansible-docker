@@ -50,6 +50,10 @@ services:
           - /opt/opencga/bin/tutorial.sh
         networks:
           - "client"
+          - "mongo_catalog"
+          - "mongo_store"
+        environment:
+            - ADMIN_PASSWORD="secret_admin_password"
         depends_on:
           - opencga_tomcat
     solr:

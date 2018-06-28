@@ -57,4 +57,6 @@ RUN cat /opt/opencga/conf/client-configuration.yml.tmp | envsubst > /opt/opencga
 RUN cat /opt/opencga/bin/tutorial.sh.tmp | envsubst > /opt/opencga/bin/tutorial.sh
 RUN chmod +x /opt/opencga/bin/tutorial.sh
 
+EXPOSE 9092
+
 CMD /bin/bash -c "/opt/opencga/bin/opencga-admin.sh catalog daemon --start -p <<< $ADMIN_PASSWORD"
