@@ -55,13 +55,14 @@ VOLUME "/opt/tomcat/webapps"
 
 WORKDIR /opt/tomcat
 
-ARG ADMIN_PASSWORD=secret-admin-password
-ARG SECRET_KEY=super-secret-key
+ENV ADMIN_PASSWORD secret-admin-password
+ENV SECRET_KEY super-secret-key
+ENV MONGO_CATALOG="mongo-catalog:27017"
+ENV MONGO_STORE="mongo-store:27017"
+ENV SOLR_HOST="http://solr:8989/solr/"
+ENV OPENCGA_HOST="opencga-tomcat"
 
-ARG MONGO_CATALOG="mongo-catalog:27017"
-ARG MONGO_STORE="mongo-store:27017"
-ARG SOLR_HOST="http://solr:8989/solr/"
-
+RUN cp -r /opt/opencga/conf /opt/opencga/conf.orig
 COPY configuration.yml /opt/opencga/conf/configuration.yml.tmp
 COPY storage-configuration.yml /opt/opencga/conf/storage-configuration.yml.tmp
 

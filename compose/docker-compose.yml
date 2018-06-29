@@ -50,6 +50,8 @@ services:
         build: ./opencga
         command:
           - /opt/opencga/bin/tutorial.sh
+        volumes:
+          - "opencga-sessions:/opt/opencga/sessions:z"
         networks:
           - "client"
           - "mongo-catalog"
@@ -68,7 +70,7 @@ services:
           - solr
     mongo-catalog:
         hostname: mongo-catalog
-        image: mongo:3.6.1-jessie
+        image: mongo:3.6
         volumes:
             - mongo-catalog-data:/data/db:rw
         networks:
@@ -76,7 +78,7 @@ services:
             
     mongo-store:
         hostname: mongo-store
-        image: mongo:3.6.1-jessie
+        image: mongo:3.6
         volumes:
             - mongo-store-data:/data/db:rw
         networks:
