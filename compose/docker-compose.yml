@@ -7,6 +7,7 @@ volumes:
     solr-data:
     prom-data:
     grafana-data:
+    es-data:
 
 networks:
     solr:
@@ -71,6 +72,7 @@ services:
           - "solr-data:/opt/solr/mydata"
         networks:
           - solr
+
     mongo-catalog:
         hostname: mongo-catalog
         image: mongo:3.6
@@ -143,3 +145,39 @@ services:
           - mon
         deploy:
           mode: global
+
+    filebeat:
+        build: ./opencga-filebeat
+        volumes:
+          - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
+          - /var/lib/docker/:/var/lib/docker:ro
+          - /var/run:/var/run:rw
+        depends_on:
+          - elasticsearch
+          - kibana
+        networks:
+          - mon
+
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.0
+        environment:
+          discovery.type: single-node
+          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+          cluster.name: opencb-logs
+          bootstrap.memory_lock: "true"
+          TAKE_FILE_OWNERSHIP: "true"
+        ulimits:
+            memlock: -1 # TODO - does this do soft and hard?
+        volumes:
+            - "es-data:/usr/share/elasticsearch/data:rw"
+        networks:
+          - mon
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana-oss:6.3.0
+        ports:
+          - 5601:5601
+        environment:
+          ELASTICSEARCH_URL: "http://elasticsearch:9200"
+        networks:
+          - mon
