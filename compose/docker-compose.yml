@@ -149,7 +149,6 @@ services:
     filebeat:
         build: ./opencga-filebeat
         volumes:
-          - ./filebeat.yml:/usr/share/filebeat/filebeat.yml
           - /var/lib/docker/:/var/lib/docker:ro
           - /var/run:/var/run:rw
         depends_on:
