@@ -5,12 +5,15 @@ volumes:
     mongo-catalog-data:
     mongo-store-data:
     solr-data:
+    prom-data:
+    grafana-data:
 
 networks:
     solr:
     mongo-catalog:
     mongo-store:
     client:
+    mon:
 
 services:
     opencga-tomcat:
@@ -83,3 +86,60 @@ services:
             - mongo-store-data:/data/db:rw
         networks:
           - "mongo-store"
+
+    prom:
+        image: prom/prometheus
+        ports:
+          - 9090:9090
+        volumes:
+          - "prom-data:/prometheus prom/prometheus"
+          - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+        #  - "{{ prometheus_home }}/alerts.rules:/etc/prometheus/alerts.rules"
+        networks:
+          - mon
+
+    grafana:
+        image: grafana/grafana
+        ports:
+          - 3000:3000
+        volumes:
+            - "grafana-data:/var/lib/grafana"
+        networks:
+          - mon
+
+    prom-node-exporter:
+        image: prom/node-exporter
+        pid: host
+        volumes:
+          - /sys:/host/sys:ro
+          - /proc:/host/proc:ro
+          - /:/rootfs:ro
+          - /etc/hostname:/etc/host_hostname:ro
+        user: root
+        environment:
+          - HOST_HOSTNAME=/etc/host_hostname
+          - "collector.procfs=/host/proc"
+          - "collector.sysfs=/host/sys"
+          - "collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+        deploy:
+          mode: global
+        networks:
+          - mon
+          - "client"
+          - "solr"
+          - "mongo-catalog"
+          - "mongo-store"
+
+    cadvisor:
+        image: google/cadvisor
+        privileged: yes
+        volumes:
+          - /:/rootfs:ro
+          - /var/run:/var/run:rw
+          - /sys:/sys:ro
+          - /var/lib/docker/:/var/lib/docker:ro
+          - /cgroup:/cgroup:ro
+        networks:
+          - mon
+        deploy:
+          mode: global
