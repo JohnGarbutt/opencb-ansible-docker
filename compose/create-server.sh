@@ -19,7 +19,6 @@ then
 	KEYPAIR_NAME=${KEYPAIR_NAME:-usual}
 	NETWORK_NAME=${NETWORK_NAME:-opencb}
 	EXTERNAL_NETWORK_NAME=${EXTERNAL_NETWORK_NAME:-CUDN-Internet}
-    GENERATE_KMEANS=${GENERATE_KMEANS:-true}
 fi
 if [ "$OS_CLOUD" == "hphi" ]
 then
@@ -29,7 +28,6 @@ then
 	KEYPAIR_NAME=${KEYPAIR_NAME:-mine}
 	NETWORK_NAME=${NETWORK_NAME:-test}
 	EXTERNAL_NETWORK_NAME=${EXTERNAL_NETWORK_NAME:-dev-vlan}
-    GENERATE_KMEANS=${GENERATE_KMEANS:-true}
 fi
 if [ "$OS_CLOUD" == "alaska" ]
 then
@@ -39,7 +37,6 @@ then
 	KEYPAIR_NAME=${KEYPAIR_NAME:-usual}
 	NETWORK_NAME=${NETWORK_NAME:-p3-internal}
 	EXTERNAL_NETWORK_NAME=${EXTERNAL_NETWORK_NAME:-ilab}
-        GENERATE_KMEANS=${GENERATE_KMEANS:-false}
 fi
 
 if ! openstack server show $NAME >/dev/null 2>&1; then
@@ -67,9 +64,13 @@ fi
 uuid=$(openstack server show $NAME --format value -c id)
 #ssh $USER@$ip
 
-./create-inventory-from-server.py $uuid > inventory
+./create-inventory-from-server.py $uuid > ./ansible/inventory
 
-#ansible-playbook -i inventory main.yml -e spark_bench_generate_kmeans=$GENERATE_KMEANS
-cat inventory
+cd ansible
+
+ansible-galaxy install -r requirements.yml
+ansible-playbook -i inventory main.yml
+
+cd ..
 
 deactivate
