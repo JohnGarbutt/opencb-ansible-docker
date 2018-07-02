@@ -1,15 +1,28 @@
 - hosts: all
-
+  become: true
   vars:
     pip_install_packages:
       - name: docker
-
-  pre-tasks:
-    - yum:
-        state: latest
-        update_cache: yes
-        update_only: yes
+      - name: docker-compose
 
   roles:
+    - geerlingguy.repo-epel
     - geerlingguy.pip
     - geerlingguy.docker
+
+- hosts: all
+  become: true
+  tasks:
+    - yum:
+        name: python,git
+        state: latest
+        update_cache: yes
+    - git:
+        repo: 'https://github.com/JohnGarbutt/opencb-ansible-docker.git'
+        dest: ~/opencb
+    - docker_service:
+        project_src: ~/opencb/compose
+      register: output
+    - debug:
+        var: output
+
