@@ -3,7 +3,8 @@
 virtualenv .venv-create
 source .venv-create/bin/activate
 pip install -U pip
-pip install python-openstackclient
+pip install -U setuptools
+pip install -U python-openstackclient
 
 set -eux
 
