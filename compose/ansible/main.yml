@@ -4,6 +4,12 @@
     pip_install_packages:
       - name: docker
 
+  pre-tasks:
+    - yum:
+        state: latest
+        update_cache: yes
+        update_only: yes
+
   roles:
     - geerlingguy.pip
     - geerlingguy.docker
