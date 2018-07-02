@@ -91,8 +91,8 @@ services:
 
     prom:
         image: prom/prometheus
-        ports:
-          - 9090:9090
+        #ports:
+        #  - 9090:9090
         volumes:
           - "prom-data:/prometheus prom/prometheus"
           - "./prometheus.yml:/etc/prometheus/prometheus.yml"
@@ -112,6 +112,8 @@ services:
 
     prom-node-exporter:
         image: prom/node-exporter
+        #ports:
+        #  - 9100:9100
         pid: host
         volumes:
           - /sys:/host/sys:ro
