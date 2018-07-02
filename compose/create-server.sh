@@ -52,7 +52,7 @@ if ! openstack server show $NAME >/dev/null 2>&1; then
 		$NAME
 
 
-	uuid=$(openstack server show spark-ukt0-test --format value -c id)
+	uuid=$(openstack server show $NAME --format value -c id)
 	floating_ip=$(openstack floating ip create $EXTERNAL_NETWORK_NAME -c floating_ip_address --format value)
 	openstack server add floating ip $uuid $floating_ip
 
@@ -63,11 +63,8 @@ if ! openstack server show $NAME >/dev/null 2>&1; then
 	done
 fi
 
-server_info=$(openstack server show $NAME --format json)
-echo $server_info
-
-ip=$(openstack server show spark-ukt0-test --format value -c addresses | cut -c 6-)
-uuid=$(openstack server show spark-ukt0-test --format value -c id)
+#ip=$(openstack server show $NAME --format value -c addresses | cut -c 6-)
+uuid=$(openstack server show $NAME --format value -c id)
 #ssh $USER@$ip
 
 ./create-inventory-from-server.py $uuid > inventory
