@@ -5,7 +5,7 @@ FROM ubuntu:16.04
 MAINTAINER OpenCB
 
 # Take from: https://launchpad.net/~webupd8team/+archive/ubuntu/java
-ARG JAVA_VERSION="8u171-1~webupd8~0"
+ARG JAVA_VERSION="8u181-1~webupd8~1"
 
 # Install dependencies
 RUN apt-get update && \
